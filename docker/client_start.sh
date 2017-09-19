@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IP="$1"
+NODE_IP="$1"
 POOL_NETWORK_NAME="$2"
 
 IMAGE_NAME="sovrinclient"
@@ -11,7 +11,7 @@ if [ "$CNT" = "--help" ]; then
         exit 1
 fi
 
-if [ -z "$POOL_NETWORK_NAME" ] || [ -z "$IP" ]; then
+if [ -z "$POOL_NETWORK_NAME" ] || [ -z "$NODE_IP" ]; then
 	echo "Invalid arguments. Try --help for usage."
 	exit 1
 fi

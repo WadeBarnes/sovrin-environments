@@ -1,0 +1,5 @@
+#!/bin/sh
+ln -f /lib/systemd/systemd /usr/lib/systemd/systemd
+ln -f /usr/lib/systemd/systemd /usr/lib/systemd/systemd-starter
+chmod ug+s /usr/lib/systemd/systemd-starter
+ln -fs ${APP_ROOT}/bin/systemd_entrypoint /sbin/init

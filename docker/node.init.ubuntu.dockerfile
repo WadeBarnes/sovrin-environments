@@ -9,9 +9,17 @@ ARG nodenum
 ARG nodecnt
 ARG clicnt=10
 
-# Init sovrin-node
-RUN init_sovrin_node $nodename $nport $cport
+ENV NODE_NUMBER $nodenum
+ENV NODE_NAME $nodename
+ENV NODE_PORT $nport
+ENV CLIENT_PORT $cport
+ENV NODE_IP_LIST $ips
+ENV NODE_COUNT $nodecnt
+ENV CLIENT_COUNT $clicnt
+ENV HOME=/home/sovrin
+
 EXPOSE $nport $cport
-RUN if [ ! -z "$ips" ] && [ ! -z "$nodenum" ] && [ ! -z "$nodecnt" ]; then generate_sovrin_pool_transactions --nodes $nodecnt --clients $clicnt --nodeNum $nodenum --ips "$ips"; fi
-USER root
-CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]
+
+COPY nodeStartupScript.sh /home/sovrin/
+
+CMD ["/home/sovrin/nodeStartupScript.sh"]
