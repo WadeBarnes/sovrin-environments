@@ -26,10 +26,3 @@ RUN echo "deb https://repo.sovrin.org/deb xenial master" >> /etc/apt/sources.lis
 
 RUN useradd -ms /bin/bash -l -u $uid -G $gid sovrin
 RUN apt-get update -y && apt-get install -y sovrin
-
-RUN chown -R sovrin:root /home/sovrin && \
-	chgrp -R 0 /home/sovrin && \
-	chmod -R g+rwX /home/sovrin
-
-USER 10001
-WORKDIR /home/sovrin

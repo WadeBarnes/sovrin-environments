@@ -25,7 +25,6 @@ EXPOSE $nport $cport
 COPY ./scripts/common/initialize.sh /home/sovrin/
 COPY ./scripts/node/start.sh /home/sovrin/
 
-USER root
 RUN chown -R sovrin:root /home/sovrin && \
 	chgrp -R 0 /home/sovrin && \
 	chmod -R g+rwX /home/sovrin && \
