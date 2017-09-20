@@ -1,6 +1,7 @@
 FROM sovrinbase
 
 ARG uid=1000
+ARG gid=0
 
 # Install environment
 RUN apt-get update -y && apt-get install -y \ 
@@ -11,16 +12,24 @@ RUN apt-get update -y && apt-get install -y \
 	python-setuptools \
 	python3-nacl \
 	apt-transport-https \
-	ca-certificates 
+	ca-certificates
+
 RUN pip3 install -U \ 
 	pip \ 
 	setuptools
+
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 68DB5E88
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BD33704C
+
 RUN echo "deb https://repo.evernym.com/deb xenial master" >> /etc/apt/sources.list 
-RUN echo "deb https://repo.sovrin.org/deb xenial master" >> /etc/apt/sources.list 
-RUN useradd -ms /bin/bash -l -u $uid sovrin
-RUN apt-get update -y && apt-get install -y \ 
-	sovrin
-USER sovrin
+RUN echo "deb https://repo.sovrin.org/deb xenial master" >> /etc/apt/sources.list
+
+RUN useradd -ms /bin/bash -l -u $uid -G $gid sovrin
+RUN apt-get update -y && apt-get install -y sovrin
+
+RUN chown -R sovrin:root /home/sovrin && \
+	chgrp -R 0 /home/sovrin && \
+	chmod -R g+rwX /home/sovrin
+
+USER 10001
 WORKDIR /home/sovrin

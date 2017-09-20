@@ -8,7 +8,7 @@
 #
 # Usage on Windows:
 #  
-# ./oc_configure_builds.sh
+#  MSYS_NO_PATHCONV=1 ./oc_configure_builds.sh
 #
 # ------------------------------------------------------------------------------
 #
@@ -18,16 +18,17 @@
 #
 # ==============================================================================
 
-SCRIPT_DIR=$(dirname $0)
 USER_ID="$(id -u)"
+SCRIPT_DIR=$(dirname $0)
+TEMPLATE_DIR="templates"
 
 ProjectName="myproject"
-BuildConfigTemplate="buildConfigTemplate.json"
+BuildConfigTemplate="${SCRIPT_DIR}/${TEMPLATE_DIR}/buildConfig.json"
 
 BuildConfigPostfix="_BuildConfig.json"
 SovrinBaseBuildConfig="sovrinBase${BuildConfigPostfix}"
 SovrinCoreBuildConfig="sovrinCore${BuildConfigPostfix}"
-SovrinNodeBuildConfigNameBase="sovrinNode"
+SovrinNodeBuildConfig="sovrinNode${BuildConfigPostfix}"
 SovrinClientBuildConfig="sovrinClient${BuildConfigPostfix}"
 
 SovrinBaseDockerFile="base.systemd.ubuntu.dockerfile"
@@ -56,9 +57,9 @@ SovrinCoreSourceImageTag="${OutputImageTag}"
 SovrinNodeSourceImageTag="${OutputImageTag}"
 SovrinClientSourceImageTag="${OutputImageTag}"
 
-GitRef="master"
-GitUri="https://github.com/evernym/sovrin-environments.git"
-GitContextDir="docker"
+GitRef="OpenShift"
+GitUri="https://github.com/WadeBarnes/sovrin-environments.git"
+GitContextDir="openshift"
 
 echo "============================================================================="
 echo "Switching to project ${ProjectName} ..."
@@ -119,7 +120,7 @@ echo
 # ToDo:
 # * Clean this up.
 # ===========================================================================
-BASE_NODE_NAME=${SovrinNodeName}
+BASE_NODE_NAME="Node"
 
 if [ -z "$BASE_IP" ]; then
   BASE_IP="10.0.0."
@@ -162,8 +163,8 @@ for i in `seq 1 $NODE_COUNT`; do
 	((PORT++))
 	CLIENT_PORT=$PORT
 	((PORT++))
-	NODE_IMAGE_NAME="$(echo "$NODE_NAME" | tr '[:upper:]' '[:lower:]')"
-	POOL_DATA="${POOL_DATA},$NODE_IMAGE_NAME ${IPS_ARRAY[i-1]} $NODE_PORT $CLIENT_PORT"	
+	SOVRIN_NODE_NAME="$(echo "$NODE_NAME" | tr '[:upper:]' '[:lower:]')"
+	POOL_DATA="${POOL_DATA},$SOVRIN_NODE_NAME ${IPS_ARRAY[i-1]} $NODE_PORT $CLIENT_PORT"	
 done
 
 POOL_DATA=${POOL_DATA:1}
@@ -174,7 +175,7 @@ echo
 # ===========================================================================
 
 # ===========================================================================
-# Sovin Node Images
+# Sovin Node Image
 # ---------------------------------------------------------------------------
 # ToDo:
 # * Clean this up.
@@ -190,17 +191,17 @@ NODE_COUNT=${#POOL_DATA[@]}
 NODE_DATA=${POOL_DATA[0]}
 IFS=" "
 NODE_DATA_ARRAY=(${NODE_DATA})
-NODE_IMAGE_NAME=${NODE_DATA_ARRAY[0]}
-NODE_NUMBER="${NODE_IMAGE_NAME:(-1)}"
+SOVRIN_NODE_NAME="$(tr '[:lower:]' '[:upper:]' <<< ${NODE_DATA_ARRAY:0:1})${NODE_DATA_ARRAY:1}"
+NODE_NUMBER="${SOVRIN_NODE_NAME:(-1)}"
 NODE_IP=${NODE_DATA_ARRAY[1]}
 NODE_PORT=${NODE_DATA_ARRAY[2]}
 CLIENT_PORT=${NODE_DATA_ARRAY[3]}
 
 echo "------------------------------------------------------------------------"
-echo "Parsed pool data for ${NODE_IMAGE_NAME} ..."
+echo "Parsed pool data for ${SOVRIN_NODE_NAME} ..."
 echo "------------------------------------------------------------------------"
 echo "NODE_DATA=${NODE_DATA}"
-echo "NODE_IMAGE_NAME=${NODE_IMAGE_NAME}"
+echo "SOVRIN_NODE_NAME=${SOVRIN_NODE_NAME}"
 echo "NODE_NUMBER=${NODE_NUMBER}"
 echo "NODE_IP=${NODE_IP}"
 echo "NODE_PORT=${NODE_PORT}"
@@ -210,13 +211,11 @@ echo "------------------------------------------------------------------------"
 echo
 IFS=$ORIGINAL_IFS
 
-SovrinNodeBuildConfig="${SovrinNodeBuildConfigNameBase}${NODE_NUMBER}${BuildConfigPostfix}"
-
 echo "------------------------------------------------------------------------"
-echo "Generating build configuration file for ${NODE_IMAGE_NAME} ..."
+echo "Generating build configuration file for ${SovrinNodeName} ..."
 echo "------------------------------------------------------------------------"
 echo "Template=${BuildConfigTemplate}"
-echo "BUILD_NAME=${NODE_IMAGE_NAME}"
+echo "BUILD_NAME=${SovrinNodeName}"
 echo "SOURCE_IMAGE_KIND=${SovrinNodeSourceImageKind}"
 echo "SOURCE_IMAGE_NAME=${SovrinNodeSourceImageName}"
 echo "SOURCE_IMAGE_TAG=${SovrinNodeSourceImageTag}"
@@ -224,9 +223,9 @@ echo "DOCKER_FILE_PATH=${SovrinNodeDockerFile}"
 echo "SOURCE_CONTEXT_DIR=${GitContextDir}"
 echo "GIT_REF=${GitRef}"
 echo "GIT_URI=${GitUri}"
-echo "OUTPUT_IMAGE_NAME=${NODE_IMAGE_NAME}"
+echo "OUTPUT_IMAGE_NAME=${SovrinNodeName}"
 echo "OUTPUT_IMAGE_TAG=${OutputImageTag}"
-echo "SOVRIN_NODE_NAME=${NODE_IMAGE_NAME}"
+echo "SOVRIN_NODE_NAME=${SOVRIN_NODE_NAME}"
 echo "SOVRIN_NODE_PORT=${NODE_PORT}"
 echo "SOVRIN_CLIENT_PORT=${CLIENT_PORT}"
 echo "SOVRIN_NODE_IP_LIST=${NODE_IP_LIST}"
@@ -238,7 +237,7 @@ echo "------------------------------------------------------------------------"
 
 oc process \
 -f ${BuildConfigTemplate} \
--p BUILD_NAME=${NODE_IMAGE_NAME} \
+-p BUILD_NAME=${SovrinNodeName} \
 -p SOURCE_IMAGE_KIND=${SovrinNodeSourceImageKind} \
 -p SOURCE_IMAGE_NAME=${SovrinNodeSourceImageName} \
 -p SOURCE_IMAGE_TAG=${SovrinNodeSourceImageTag} \
@@ -246,9 +245,9 @@ oc process \
 -p SOURCE_CONTEXT_DIR=${GitContextDir} \
 -p GIT_REF=${GitRef} \
 -p GIT_URI=${GitUri} \
--p OUTPUT_IMAGE_NAME=${NODE_IMAGE_NAME} \
+-p OUTPUT_IMAGE_NAME=${SovrinNodeName} \
 -p OUTPUT_IMAGE_TAG=${OutputImageTag} \
--p SOVRIN_NODE_NAME=${NODE_IMAGE_NAME} \
+-p SOVRIN_NODE_NAME=${SOVRIN_NODE_NAME} \
 -p SOVRIN_NODE_PORT=${NODE_PORT} \
 -p SOVRIN_CLIENT_PORT=${CLIENT_PORT} \
 -p SOVRIN_NODE_IP_LIST=${NODE_IP_LIST} \
@@ -279,7 +278,7 @@ LAST_NODE_IP=""
 for NODE_DATA in "${POOL_DATA[@]}"; do
 	IFS=" "
 	NODE_DATA_ARRAY=(${NODE_DATA})
-	NODE_IMAGE_NAME=${NODE_DATA_ARRAY[0]}
+	SOVRIN_NODE_NAME="$(tr '[:lower:]' '[:upper:]' <<< ${NODE_DATA_ARRAY:0:1})${NODE_DATA_ARRAY:1}"
 	NODE_IP=${NODE_DATA_ARRAY[1]}
 	NODE_PORT=${NODE_DATA_ARRAY[2]}
 	CLIENT_PORT=${NODE_DATA_ARRAY[3]}
@@ -287,10 +286,10 @@ for NODE_DATA in "${POOL_DATA[@]}"; do
 	NODE_IP_LIST="${NODE_IP_LIST},${NODE_IP}"
 
 	echo "------------------------------------------------------------------------"
-	echo "Parsed pool data for ${NODE_IMAGE_NAME} ..."
+	echo "Parsed pool data for ${SOVRIN_NODE_NAME} ..."
 	echo "------------------------------------------------------------------------"
 	echo "NODE_DATA=${NODE_DATA}"
-	echo "NODE_IMAGE_NAME=${NODE_IMAGE_NAME}"
+	echo "SOVRIN_NODE_NAME=${SOVRIN_NODE_NAME}"
 	echo "NODE_IP=${NODE_IP}"
 	echo "NODE_PORT=${NODE_PORT}"
 	echo "CLIENT_PORT=${CLIENT_PORT}"
@@ -355,18 +354,18 @@ echo "Generated ${SovrinClientBuildConfig} ..."
 echo
 # ===========================================================================
 
-echo "============================================================================="
-echo "Cleaning out existing OpenShift resources ..."
-echo "============================================================================"
-oc delete imagestreams,bc --all
-echo
+# echo "============================================================================="
+# echo "Cleaning out existing OpenShift resources ..."
+# echo "============================================================================"
+# oc delete imagestreams,bc --all
+# echo
 
-echo "============================================================================="
-echo "Creating build configurations in OpenShift project; ${ProjectName} ..."
-echo "============================================================================="
-for file in *_BuildConfig.json; do 
-	echo "Loading ${file} ...";
-	oc create -f ${file};
-	echo;
-done
-echo
+# echo "============================================================================="
+# echo "Creating build configurations in OpenShift project; ${ProjectName} ..."
+# echo "============================================================================="
+# for file in *_BuildConfig.json; do 
+	# echo "Loading ${file} ...";
+	# oc create -f ${file};
+	# echo;
+# done
+# echo

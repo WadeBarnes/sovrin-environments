@@ -8,7 +8,7 @@
 #
 # Usage on Windows:
 #  
-# ./oc_configure_deployments.sh
+#  MSYS_NO_PATHCONV=1 ./oc_configure_deployments.sh
 #
 # -------------------------------------------------------------------------------------
 #
@@ -18,18 +18,19 @@
 #
 # =====================================================================================
 
-SCRIPT_DIR=$(dirname $0)
 USER_ID="$(id -u)"
+SCRIPT_DIR=$(dirname $0)
+TEMPLATE_DIR="templates"
 
 ProjectName="myproject"
-DeploymentConfigTemplate="deploymentConfigTemplate.json"
+DeploymentConfigTemplate="${SCRIPT_DIR}/${TEMPLATE_DIR}/deploymentConfig.json"
 
 DeploymentConfigPostfix="_DeploymentConfig.json"
 SovrinNodeDeploymentConfigNameBase="sovrinNode"
 SovrinClientDeploymentConfig="sovrinClient${DeploymentConfigPostfix}"
 
 SovrinClientName="sovrinclient"
-SovrinNodeSourceImageName="sovrinnode1"
+SovrinNodeName="sovrinnode"
 SovrinHomeDirectory="/home/sovrin"
 
 ImageTag="latest"
@@ -88,17 +89,17 @@ NODE_IP_LIST="${NODE_IP_LIST:1}"
 for NODE_DATA in "${POOL_DATA[@]}"; do
 	IFS=" "
 	NODE_DATA_ARRAY=(${NODE_DATA})
-	NODE_IMAGE_NAME=${NODE_DATA_ARRAY[0]}
-	NODE_NUMBER="${NODE_IMAGE_NAME:(-1)}"
+	SOVRIN_NODE_NAME="$(tr '[:lower:]' '[:upper:]' <<< ${NODE_DATA_ARRAY:0:1})${NODE_DATA_ARRAY:1}"
+	NODE_NUMBER="${SOVRIN_NODE_NAME:(-1)}"
 	NODE_IP=${NODE_DATA_ARRAY[1]}
 	NODE_PORT=${NODE_DATA_ARRAY[2]}
 	CLIENT_PORT=${NODE_DATA_ARRAY[3]}
 	
 	echo "------------------------------------------------------------------------"
-	echo "Parsed pool data for ${NODE_IMAGE_NAME} ..."
+	echo "Parsed pool data for ${SOVRIN_NODE_NAME} ..."
 	echo "------------------------------------------------------------------------"
 	echo "NODE_DATA=${NODE_DATA}"
-	echo "NODE_IMAGE_NAME=${NODE_IMAGE_NAME}"
+	echo "SOVRIN_NODE_NAME=${SOVRIN_NODE_NAME}"
 	echo "NODE_NUMBER=${NODE_NUMBER}"
 	echo "NODE_IP=${NODE_IP}"
 	echo "NODE_PORT=${NODE_PORT}"
@@ -107,22 +108,24 @@ for NODE_DATA in "${POOL_DATA[@]}"; do
 	echo "------------------------------------------------------------------------"
 	echo
 	
-	SovrinNodeDeploymentConfig="${NODE_IMAGE_NAME}${DeploymentConfigPostfix}"
-	ServiceDescription="Exposes and load balances the pods for ${NODE_IMAGE_NAME}."
+	
+	SovrinNodeApplicationName="${SovrinNodeName}${NODE_NUMBER}"
+	SovrinNodeDeploymentConfig="${SovrinNodeDeploymentConfigNameBase}${NODE_NUMBER}${DeploymentConfigPostfix}"
+	ServiceDescription="Exposes and load balances the pods for ${SOVRIN_NODE_NAME}."
 	ApplicationHostName=""
 	ImageNamespace=""
 	
 	echo "------------------------------------------------------------------------"
-	echo "Generating build configuration file for ${NODE_IMAGE_NAME} ..."
+	echo "Generating build configuration file for ${SOVRIN_NODE_NAME} ..."
 	echo "------------------------------------------------------------------------"
 	echo "Template=${DeploymentConfigTemplate}"
-	echo "APPLICATION_NAME=${NODE_IMAGE_NAME}"
+	echo "APPLICATION_NAME=${SovrinNodeApplicationName}"
 	echo "APPLICATION_SERVICE_DESCRIPTION=${ServiceDescription}"
 	echo "APPLICATION_HOSTNAME=${ApplicationHostName}"
-	echo "SOURCE_IMAGE_NAME=${SovrinNodeSourceImageName}"
+	echo "SOURCE_IMAGE_NAME=${SovrinNodeName}"
 	echo "IMAGE_NAMESPACE=${ImageNamespace}"
 	echo "DEPLOYMENT_TAG=${ImageTag}"
-	echo "NODE_NAME=${NODE_IMAGE_NAME}"
+	echo "NODE_NAME=${SOVRIN_NODE_NAME}"
 	echo "NODE_NUMBER=${NODE_NUMBER}"
 	echo "NODE_PORT=${NODE_PORT}"
 	echo "CLIENT_PORT=${CLIENT_PORT}"
@@ -136,13 +139,13 @@ for NODE_DATA in "${POOL_DATA[@]}"; do
 	
 	oc process \
 	-f ${DeploymentConfigTemplate} \
-	-p APPLICATION_NAME=${NODE_IMAGE_NAME} \
+	-p APPLICATION_NAME=${SovrinNodeApplicationName} \
 	-p APPLICATION_SERVICE_DESCRIPTION="${ServiceDescription}" \
 	-p APPLICATION_HOSTNAME=${ApplicationHostName} \
-	-p SOURCE_IMAGE_NAME=${SovrinNodeSourceImageName} \
+	-p SOURCE_IMAGE_NAME=${SovrinNodeName} \
 	-p IMAGE_NAMESPACE=${ImageNamespace} \
 	-p DEPLOYMENT_TAG=${ImageTag} \
-	-p NODE_NAME=${NODE_IMAGE_NAME} \
+	-p NODE_NAME=${SOVRIN_NODE_NAME} \
 	-p NODE_NUMBER=${NODE_NUMBER} \
 	-p NODE_PORT=${NODE_PORT} \
 	-p CLIENT_PORT=${CLIENT_PORT} \
@@ -194,18 +197,18 @@ echo "Generated ${SovrinClientDeploymentConfig} ..."
 echo	
 # ===========================================================================
 
-echo "============================================================================="
-echo "Cleaning out all existing OpenShift resources ..."
-echo "============================================================================"
-oc delete routes,services,dc --all
-echo
+# echo "============================================================================="
+# echo "Cleaning out all existing OpenShift resources ..."
+# echo "============================================================================"
+# oc delete routes,services,dc --all
+# echo
 
-echo "============================================================================="
-echo "Creating deployment configurations in OpenShift project; ${ProjectName} ..."
-echo "============================================================================="
-for file in *${DeploymentConfigPostfix}; do 
-	echo "Loading ${file} ...";
-	oc create -f ${file};
-	echo;
-done
-echo
+# echo "============================================================================="
+# echo "Creating deployment configurations in OpenShift project; ${ProjectName} ..."
+# echo "============================================================================="
+# for file in *${DeploymentConfigPostfix}; do 
+	# echo "Loading ${file} ...";
+	# oc create -f ${file};
+	# echo;
+# done
+# echo
