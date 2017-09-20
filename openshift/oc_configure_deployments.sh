@@ -116,7 +116,7 @@ for NODE_DATA in "${POOL_DATA[@]}"; do
 	ImageNamespace=""
 	
 	echo "------------------------------------------------------------------------"
-	echo "Generating build configuration file for ${SOVRIN_NODE_NAME} ..."
+	echo "Generating deployment configuration file for ${SOVRIN_NODE_NAME} ..."
 	echo "------------------------------------------------------------------------"
 	echo "Template=${DeploymentConfigTemplate}"
 	echo "APPLICATION_NAME=${SovrinNodeApplicationName}"
@@ -171,7 +171,7 @@ ApplicationHostName=""
 ImageNamespace=""
 
 echo "------------------------------------------------------------------------"
-echo "Generating build configuration file for ${SovrinClientName} ..."
+echo "Generating deploytment configuration file for ${SovrinClientName} ..."
 echo "------------------------------------------------------------------------"
 echo "Template=${DeploymentConfigTemplate}"
 echo "APPLICATION_NAME=${SovrinClientName}"
@@ -180,6 +180,10 @@ echo "APPLICATION_HOSTNAME=${ApplicationHostName}"
 echo "SOURCE_IMAGE_NAME=${SovrinClientName}"
 echo "IMAGE_NAMESPACE=${ImageNamespace}"
 echo "DEPLOYMENT_TAG=${ImageTag}"
+echo "NODE_IP_LIST=${NODE_IP_LIST}"
+echo "NODE_COUNT=${NODE_COUNT}"
+echo "CLIENT_COUNT=${CLIENT_COUNT}"
+echo "HOME_DIR=${SovrinHomeDirectory}"	
 echo "Output File=${SovrinClientDeploymentConfig}"
 echo "------------------------------------------------------------------------"
 echo
@@ -192,23 +196,27 @@ oc process \
 -p SOURCE_IMAGE_NAME=${SovrinClientName} \
 -p IMAGE_NAMESPACE=${ImageNamespace} \
 -p DEPLOYMENT_TAG=${ImageTag} \
+-p NODE_IP_LIST=${NODE_IP_LIST} \
+-p NODE_COUNT=${NODE_COUNT} \
+-p CLIENT_COUNT=${CLIENT_COUNT} \
+-p HOME_DIR=${SovrinHomeDirectory} \
 > ${SovrinClientDeploymentConfig}
 echo "Generated ${SovrinClientDeploymentConfig} ..."
 echo	
 # ===========================================================================
 
-# echo "============================================================================="
-# echo "Cleaning out all existing OpenShift resources ..."
-# echo "============================================================================"
-# oc delete routes,services,dc --all
-# echo
+echo "============================================================================="
+echo "Cleaning out all existing OpenShift resources ..."
+echo "============================================================================"
+oc delete routes,services,dc --all
+echo
 
-# echo "============================================================================="
-# echo "Creating deployment configurations in OpenShift project; ${ProjectName} ..."
-# echo "============================================================================="
-# for file in *${DeploymentConfigPostfix}; do 
-	# echo "Loading ${file} ...";
-	# oc create -f ${file};
-	# echo;
-# done
-# echo
+echo "============================================================================="
+echo "Creating deployment configurations in OpenShift project; ${ProjectName} ..."
+echo "============================================================================="
+for file in *${DeploymentConfigPostfix}; do 
+	echo "Loading ${file} ...";
+	oc create -f ${file};
+	echo;
+done
+echo

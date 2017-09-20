@@ -22,7 +22,9 @@ ENV HOLD_EXT="sovrin "
 
 EXPOSE $nport $cport
 
+USER 10001
 COPY ./scripts/common/initialize.sh /home/sovrin/
 COPY ./scripts/node/start.sh /home/sovrin/
 
+WORKDIR /home/sovrin
 CMD ["/home/sovrin/start.sh"]
