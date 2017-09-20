@@ -22,9 +22,13 @@ ENV HOLD_EXT="sovrin "
 
 EXPOSE $nport $cport
 
-USER 10001
 COPY ./scripts/common/initialize.sh /home/sovrin/
 COPY ./scripts/node/start.sh /home/sovrin/
 
+RUN chown -R sovrin:root /home/sovrin && \
+	chgrp -R 0 /home/sovrin && \
+	chmod -R g+rwX /home/sovrin
+
+USER 10001
 WORKDIR /home/sovrin
 CMD ["/home/sovrin/start.sh"]
