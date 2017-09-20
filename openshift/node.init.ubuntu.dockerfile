@@ -28,7 +28,9 @@ COPY ./scripts/node/start.sh /home/sovrin/
 USER root
 RUN chown -R sovrin:root /home/sovrin && \
 	chgrp -R 0 /home/sovrin && \
-	chmod -R g+rwX /home/sovrin
+	chmod -R g+rwX /home/sovrin && \
+	chmod +x /home/sovrin/initialize.sh && \
+	chmod +x /home/sovrin/start.sh
 
 USER 10001
 WORKDIR /home/sovrin
