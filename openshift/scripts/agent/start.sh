@@ -5,12 +5,12 @@ $SCRIPT_DIR/initialize.sh
 
 agentName="$(echo "$AGENT_NAME" | tr '[:upper:]' '[:lower:]')"
 
-# /usr/bin/env python3 /usr/local/lib/python3.5/dist-packages/sovrin_client/test/agent/faber.py --port 5555 >faber.log
-# /usr/bin/env python3 /usr/local/lib/python3.5/dist-packages/sovrin_client/test/agent/acme.py --port 6666 >acme.log
-# /usr/bin/env python3 /usr/local/lib/python3.5/dist-packages/sovrin_client/test/agent/thrift.py --port 7777 >thrift.log
-: ${startCmd:='/usr/bin/env python3 /usr/local/lib/python3.5/dist-packages/sovrin_client/test/agent/${agentName}.py --port ${AGENT_PORT} > ${agentName}.log'}
+# Examples:
+# /usr/bin/env python3 /usr/local/lib/python3.5/dist-packages/sovrin_client/test/agent/faber.py --port 5555 > faber.log
+# /usr/bin/env python3 /usr/local/lib/python3.5/dist-packages/sovrin_client/test/agent/acme.py --port 6666 > acme.log
+# /usr/bin/env python3 /usr/local/lib/python3.5/dist-packages/sovrin_client/test/agent/thrift.py --port 7777 > thrift.log
 
 echo "Starting ${AGENT_NAME} agent node ..."
-echo "$(eval "echo ${startCmd}")"
+echo "/usr/bin/env python3 /usr/local/lib/python3.5/dist-packages/sovrin_client/test/agent/${agentName}.py --port ${AGENT_PORT} > ${agentName}.log"
 echo
-eval ${startCmd}
+exec /usr/bin/env python3 /usr/local/lib/python3.5/dist-packages/sovrin_client/test/agent/${agentName}.py --port ${AGENT_PORT} > ${agentName}.log

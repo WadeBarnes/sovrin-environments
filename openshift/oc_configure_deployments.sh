@@ -31,7 +31,17 @@ SovrinClientDeploymentConfig="sovrinClient${DeploymentConfigPostfix}"
 
 SovrinClientName="sovrinclient"
 SovrinNodeName="sovrinnode"
+SovrinAgentName="sovrinagent"
 SovrinHomeDirectory="/home/sovrin"
+
+FaberAgentName="Faber"
+FaberAgentPort="5555"
+
+AcmeAgentName="Acme"
+AcmeAgentPort="6666"
+
+ThriftAgentName="Thrift"
+ThriftAgentPort="7777"
 
 ImageTag="latest"
 
@@ -203,6 +213,49 @@ oc process \
 > ${SovrinClientDeploymentConfig}
 echo "Generated ${SovrinClientDeploymentConfig} ..."
 echo	
+# ===========================================================================
+
+# ===========================================================================
+# Sovin Agent Deployment Configurations
+# ---------------------------------------------------------------------------
+# ToDo:
+# * Get this information from a list like pool_data.
+# ===========================================================================
+${SCRIPT_DIR}/oc_configure_agent_deployment.sh \
+ ${DeploymentConfigTemplate} \
+ ${DeploymentConfigPostfix} \
+ ${SovrinAgentName} \
+ ${ImageTag} \
+ ${NODE_IP_LIST} \
+ ${NODE_COUNT} \
+ ${CLIENT_COUNT} \
+ ${SovrinHomeDirectory} \
+ ${FaberAgentName} \
+ ${FaberAgentPort}
+ 
+${SCRIPT_DIR}/oc_configure_agent_deployment.sh \
+ ${DeploymentConfigTemplate} \
+ ${DeploymentConfigPostfix} \
+ ${SovrinAgentName} \
+ ${ImageTag} \
+ ${NODE_IP_LIST} \
+ ${NODE_COUNT} \
+ ${CLIENT_COUNT} \
+ ${SovrinHomeDirectory} \
+ ${AcmeAgentName} \
+ ${AcmeAgentPort}
+ 
+${SCRIPT_DIR}/oc_configure_agent_deployment.sh \
+ ${DeploymentConfigTemplate} \
+ ${DeploymentConfigPostfix} \
+ ${SovrinAgentName} \
+ ${ImageTag} \
+ ${NODE_IP_LIST} \
+ ${NODE_COUNT} \
+ ${CLIENT_COUNT} \
+ ${SovrinHomeDirectory} \
+ ${ThriftAgentName} \
+ ${ThriftAgentPort}
 # ===========================================================================
 
 echo "============================================================================="
