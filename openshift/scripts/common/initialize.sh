@@ -37,7 +37,20 @@ if [ ! -z "${NODE_COUNT}" ] && [ ! -z "${CLIENT_COUNT}" ] && [ ! -z "${NODE_NUMB
   echo
 fi
 
-if [ ! -z "${NODE_COUNT}" ] && [ ! -z "${CLIENT_COUNT}" ] && [ -z "${NODE_NUMBER}" ] && [ ! -z "${NODE_IP_LIST}" ]; then 
+if [ -z "${NODE_NUMBER}" ] && [ ! -z "${AGENT_NAME}" ] &&[ ! -z "${NODE_COUNT}" ] && [ ! -z "${CLIENT_COUNT}" ] && [ ! -z "${NODE_IP_LIST}" ]; then 
+  echo ===============================================================================
+  echo "Generating sovrin pool transactions for agent node:"
+  echo -e "\tAgent Name: ${AGENT_NAME}"
+  echo -e "\tNode Count: ${NODE_COUNT}"
+  echo -e "\tClient Count: ${CLIENT_COUNT}"
+  echo -e "\tNode IP Address List: ${NODE_IP_LIST}"
+  echo -------------------------------------------------------------------------------
+  generate_sovrin_pool_transactions --nodes ${NODE_COUNT} --clients ${CLIENT_COUNT} --ips "${NODE_IP_LIST}"; 
+  echo ===============================================================================
+  echo
+fi
+
+if [ -z "${NODE_NUMBER}" ] && [ -z "${AGENT_NAME}" ] &&[ ! -z "${NODE_COUNT}" ] && [ ! -z "${CLIENT_COUNT}" ] && [ ! -z "${NODE_IP_LIST}" ]; then 
   echo ===============================================================================
   echo "Generating sovrin pool transactions for client node:"
   echo -e "\tNode Count: ${NODE_COUNT}"

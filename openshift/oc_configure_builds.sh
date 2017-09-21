@@ -30,32 +30,41 @@ SovrinBaseBuildConfig="sovrinBase${BuildConfigPostfix}"
 SovrinCoreBuildConfig="sovrinCore${BuildConfigPostfix}"
 SovrinNodeBuildConfig="sovrinNode${BuildConfigPostfix}"
 SovrinClientBuildConfig="sovrinClient${BuildConfigPostfix}"
+SovrinAgentBuildConfig="sovrinAgent${BuildConfigPostfix}"
 
 SovrinBaseDockerFile="base.systemd.ubuntu.dockerfile"
 SovrinCoreDockerFile="core.ubuntu.dockerfile"
 SovrinNodeDockerFile="node.init.ubuntu.dockerfile"
 SovrinClientDockerFile="client.ubuntu.dockerfile"
+SovrinAgentDockerFile="agent.ubuntu.dockerfile"
 
 SovrinBaseName="sovrinbase"
 SovrinCoreName="sovrincore"
 SovrinNodeName="sovrinnode"
 SovrinClientName="sovrinclient"
+SovrinAgentName="sovrinagent"
+
+SovrinAgentInstanceName="Faber"
+SovrinAgentInstancePort="5555"
 
 SovrinBaseSourceImageKind="DockerImage"
 SovrinCoreSourceImageKind="ImageStreamTag"
 SovrinNodeSourceImageKind="ImageStreamTag"
 SovrinClientSourceImageKind="ImageStreamTag"
+SovrinAgentSourceImageKind="ImageStreamTag"
 
 SovrinBaseSourceImageName="solita/ubuntu-systemd"
 SovrinCoreSourceImageName="sovrinbase"
 SovrinNodeSourceImageName="sovrincore"
 SovrinClientSourceImageName="sovrincore"
+SovrinAgentSourceImageName="sovrincore"
 
 OutputImageTag="latest"
 SovrinBaseSourceImageTag="16.04"
 SovrinCoreSourceImageTag="${OutputImageTag}"
 SovrinNodeSourceImageTag="${OutputImageTag}"
 SovrinClientSourceImageTag="${OutputImageTag}"
+SovrinAgentSourceImageTag="${OutputImageTag}"
 
 GitRef="OpenShift"
 GitUri="https://github.com/WadeBarnes/sovrin-environments.git"
@@ -351,6 +360,56 @@ oc process \
 -p SOVRIN_CLIENT_COUNT=${CLIENT_COUNT} \
 > ${SovrinClientBuildConfig}
 echo "Generated ${SovrinClientBuildConfig} ..."
+echo
+# ===========================================================================
+
+# ===========================================================================
+# Sovin Agent Image
+# ---------------------------------------------------------------------------
+# ToDo:
+# * Clean this up.
+# ===========================================================================
+echo "------------------------------------------------------------------------"
+echo "Generating build configuration file for ${SovrinAgentName} ..."
+echo "------------------------------------------------------------------------"
+echo "Template=${BuildConfigTemplate}"
+echo "BUILD_NAME=${SovrinAgentName}"
+echo "SOURCE_IMAGE_KIND=${SovrinAgentSourceImageKind}"
+echo "SOURCE_IMAGE_NAME=${SovrinAgentSourceImageName}"
+echo "SOURCE_IMAGE_TAG=${SovrinAgentSourceImageTag}"
+echo "DOCKER_FILE_PATH=${SovrinAgentDockerFile}"
+echo "SOURCE_CONTEXT_DIR=${GitContextDir}"
+echo "GIT_REF=${GitRef}"
+echo "GIT_URI=${GitUri}"
+echo "OUTPUT_IMAGE_NAME=${SovrinAgentName}"
+echo "OUTPUT_IMAGE_TAG=${OutputImageTag}"
+echo "SOVRIN_NODE_IP_LIST=${NODE_IP_LIST}"
+echo "SOVRIN_NODE_COUNT=${NODE_COUNT}"
+echo "SOVRIN_CLIENT_COUNT=${CLIENT_COUNT}"
+echo "SOVRIN_AGENT_NAME=${SovrinAgentInstanceName}"
+echo "SOVRIN_AGENT_PORT=${SovrinAgentInstancePort}"
+echo "Output File=${SovrinAgentBuildConfig}"
+echo "------------------------------------------------------------------------"
+
+oc process \
+-f ${BuildConfigTemplate} \
+-p BUILD_NAME=${SovrinAgentName} \
+-p SOURCE_IMAGE_KIND=${SovrinAgentSourceImageKind} \
+-p SOURCE_IMAGE_NAME=${SovrinAgentSourceImageName} \
+-p SOURCE_IMAGE_TAG=${SovrinAgentSourceImageTag} \
+-p DOCKER_FILE_PATH=${SovrinAgentDockerFile} \
+-p SOURCE_CONTEXT_DIR=${GitContextDir} \
+-p GIT_REF=${GitRef} \
+-p GIT_URI=${GitUri} \
+-p OUTPUT_IMAGE_NAME=${SovrinAgentName} \
+-p OUTPUT_IMAGE_TAG=${OutputImageTag} \
+-p SOVRIN_NODE_IP_LIST=${NODE_IP_LIST} \
+-p SOVRIN_NODE_COUNT=${NODE_COUNT} \
+-p SOVRIN_CLIENT_COUNT=${CLIENT_COUNT} \
+-p SOVRIN_AGENT_NAME=${SovrinAgentInstanceName} \
+-p SOVRIN_AGENT_PORT=${SovrinAgentInstancePort} \
+> ${SovrinAgentBuildConfig}
+echo "Generated ${SovrinAgentBuildConfig} ..."
 echo
 # ===========================================================================
 
