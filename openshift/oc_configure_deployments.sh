@@ -74,7 +74,8 @@ ThriftAgentPort="7777"
 NODE_IP_LIST=$(${SCRIPT_DIR}/getNodeAddressListFromPool.sh ${POOL_DATA_FILE})
 NODE_COUNT=$(${SCRIPT_DIR}/getNodeCount.sh ${NODE_IP_LIST})
 
-BASE_NODE_NAME=$(${SCRIPT_DIR}/getBaseNodeNameFromPool.sh ${POOL_DATA_FILE})
+NODE_DATA=$(${SCRIPT_DIR}/getNodeInfoFromPool.sh ${POOL_DATA_FILE})
+BASE_NODE_NAME=$(${SCRIPT_DIR}/getNodeInfo.sh "${NODE_DATA}" "basename")
 BASE_NODE_NAME="$(echo "$BASE_NODE_NAME" | tr '[:lower:]' '[:upper:]')"
 NODE_SERVICE_HOST_PATTERN="${BASE_NODE_NAME}[0-9]+_SERVICE_HOST="
 # =====================================================================================
