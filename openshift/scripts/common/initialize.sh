@@ -1,7 +1,9 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(dirname $0)
+
 if [ ! -z "${NODE_SERVICE_HOST_PATTERN}" ]; then 
-  NEW_NODE_IP_LIST=$(./getNodeAddressList.sh ${NODE_SERVICE_HOST_PATTERN})
+  NEW_NODE_IP_LIST=$(${SCRIPT_DIR}/getNodeAddressList.sh ${NODE_SERVICE_HOST_PATTERN})
   rc=${?}; 
   if [[ ${rc} != 0 ]]; then
     echo "Call to getNodeAddressList.sh failed:"
@@ -9,7 +11,7 @@ if [ ! -z "${NODE_SERVICE_HOST_PATTERN}" ]; then
     exit ${rc}; 
   fi
 
-  NEW_NODE_COUNT=$(./getNodeCount.sh ${NEW_NODE_IP_LIST})
+  NEW_NODE_COUNT=$(${SCRIPT_DIR}/getNodeCount.sh ${NEW_NODE_IP_LIST})
   rc=${?}; 
   if [[ ${rc} != 0 ]]; then
     echo "Call to getNodeCount.sh failed:"

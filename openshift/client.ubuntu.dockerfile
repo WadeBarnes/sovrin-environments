@@ -17,8 +17,7 @@ COPY ./scripts/client/start.sh /home/sovrin/
 RUN chown -R sovrin:root /home/sovrin && \
 	chgrp -R 0 /home/sovrin && \
 	chmod -R g+rwX /home/sovrin && \
-	chmod +x /home/sovrin/initialize.sh && \
-	chmod +x /home/sovrin/start.sh
+	chmod +x /home/sovrin/*.sh
 
 USER 10001
 WORKDIR /home/sovrin
