@@ -14,6 +14,7 @@ SOURCE_IMAGE_NAME="${5}"
 IMAGE_TAG="${6}"
 NODE_IP_LIST="${7}"
 HOME_DIRECTORY="${8}"
+NODE_SERVICE_HOST_PATTERN="${9}"
 # -----------------------------------------------------------------------------------
 #DEBUG_MESSAGES=1
 # -----------------------------------------------------------------------------------
@@ -57,6 +58,11 @@ if [ -z "$HOME_DIRECTORY" ]; then
 	MissingParam=1
 fi
 
+if [ -z "$NODE_SERVICE_HOST_PATTERN" ]; then
+	echo "You must supply NODE_SERVICE_HOST_PATTERN."
+	MissingParam=1
+fi
+
 if [ ! -z "$MissingParam" ]; then
 	echo "============================================"
 	echo "One or more parameters are missing!"
@@ -69,6 +75,7 @@ if [ ! -z "$MissingParam" ]; then
 	echo "IMAGE_TAG[{6}]: ${6}"
 	echo "NODE_IP_LIST[{7}]: ${7}"
 	echo "HOME_DIRECTORY[{8}]: ${8}"
+	echo "NODE_SERVICE_HOST_PATTERN[{9}]: ${9}"
 	echo "============================================"
 	echo
 	exit 1
@@ -119,6 +126,7 @@ for NODE_DATA in "${POOL_DATA[@]}"; do
 		echo "NODE_NAME: ${NODE_NAME}"
 		echo "NODE_NUMBER: ${NODE_NUMBER}"
 		echo "NODE_PORT: ${NODE_PORT}"
+    echo "NODE_SERVICE_HOST_PATTERN=${NODE_SERVICE_HOST_PATTERN}"
 		echo "------------------------------------------------------------------------"
 		echo
 	fi
@@ -135,7 +143,8 @@ for NODE_DATA in "${POOL_DATA[@]}"; do
 		${HOME_DIRECTORY} \
 		${NODE_NAME} \
 		${NODE_NUMBER} \
-		${NODE_PORT}
+		${NODE_PORT} \
+    ${NODE_SERVICE_HOST_PATTERN}
 done
 
 IFS=${ORIGINAL_IFS}
