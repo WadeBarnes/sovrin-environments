@@ -1,15 +1,38 @@
 #!/bin/bash
 
-if [ ! -z "${SOVRINNODE1_SERVICE_HOST}" ]; then 
-  echo ===============================================================================
-  echo "Configuring OpenShift environment ..."
-  echo "Changing;"
-  echo -e "\tNODE_IP_LIST: ${NODE_IP_LIST}"
-  export NODE_IP_LIST=${SOVRINNODE1_SERVICE_HOST},${SOVRINNODE2_SERVICE_HOST},${SOVRINNODE3_SERVICE_HOST},${SOVRINNODE4_SERVICE_HOST}
-  echo -e "\tto"
-  echo -e "\tNODE_IP_LIST: ${NODE_IP_LIST}"
-  echo ===============================================================================
-  echo
+if [ ! -z "${NODE_SERVICE_HOST_PATTERN}" ]; then 
+  NEW_NODE_IP_LIST=$(./getNodeAddressList.sh ${NODE_SERVICE_HOST_PATTERN})
+  rc=${?}; 
+  if [[ ${rc} != 0 ]]; then
+    echo "Call to getNodeAddressList.sh failed:"
+    echo -e "\t${NEW_NODE_IP_LIST}"
+    exit ${rc}; 
+  fi
+
+  NEW_NODE_COUNT=$(./getNodeCount.sh ${NEW_NODE_IP_LIST})
+  rc=${?}; 
+  if [[ ${rc} != 0 ]]; then
+    echo "Call to getNodeCount.sh failed:"
+    echo -e "\t${NEW_NODE_COUNT}"
+    exit ${rc}; 
+  fi    
+
+  if [ ! -z "$NEW_NODE_IP_LIST" ]; then
+    echo ===============================================================================
+    echo "Configuring OpenShift environment ..."
+    echo -------------------------------------------------------------------------------
+    echo "Changing;"
+    echo -e "\tNODE_IP_LIST: ${NODE_IP_LIST}"
+    export NODE_IP_LIST=${NEW_NODE_IP_LIST}
+    echo -e "\tNODE_IP_LIST: ${NODE_IP_LIST}"
+    echo -------------------------------------------------------------------------------
+    echo "Changing;"
+    echo -e "\NODE_COUNT: ${NODE_COUNT}"
+    export NODE_COUNT=${NEW_NODE_COUNT}
+    echo -e "\NODE_COUNT: ${NODE_COUNT}"
+    echo ===============================================================================
+    echo
+  fi
 fi
 
 if [ ! -z "${NODE_NAME}" ] && [ ! -z "${NODE_PORT}" ] && [ ! -z "${CLIENT_PORT}" ]; then 

@@ -4,7 +4,7 @@ USER_ID="$(id -u)"
 SCRIPT_DIR=$(dirname $0)
 
 # ===========================================================================
-# Generate an Agent Deployment Configuration
+# Generate a Client Deployment Configuration
 # ===========================================================================
 DEPLOYMENT_CONFIG_TEMPLATE="${1}"
 DEPLOYMENT_CONFIG_POST_FIX="${2}"
@@ -14,9 +14,8 @@ NODE_IP_LIST="${5}"
 NODE_COUNT="${6}"
 CLIENT_COUNT="${7}"
 HOME_DIRECTORY="${8}"
-AGENT_NAME="${9}"
-AGENT_PORT="${10}"
-NODE_SERVICE_HOST_PATTERN="${11}"
+CLIENT_NAME="${9}"
+NODE_SERVICE_HOST_PATTERN="${10}"
 # -----------------------------------------------------------------------------------
 #DEBUG_MESSAGES=1
 # -----------------------------------------------------------------------------------
@@ -60,13 +59,8 @@ if [ -z "$HOME_DIRECTORY" ]; then
 	MissingParam=1
 fi
 
-if [ -z "$AGENT_NAME" ]; then
-	echo "You must supply AGENT_NAME."
-	MissingParam=1
-fi
-
-if [ -z "$AGENT_PORT" ]; then
-	echo "You must supply AGENT_PORT."
+if [ -z "$CLIENT_NAME" ]; then
+	echo "You must supply CLIENT_NAME."
 	MissingParam=1
 fi
 
@@ -87,27 +81,26 @@ if [ ! -z "$MissingParam" ]; then
 	echo "NODE_COUNT[{6}]: ${6}"
 	echo "CLIENT_COUNT[{7}]: ${7}"
 	echo "HOME_DIRECTORY[{8}]: ${8}"
-	echo "AGENT_NAME[{9}]: ${9}"
-	echo "AGENT_PORT[{10}]: ${10}"
-	echo "NODE_SERVICE_HOST_PATTERN[{11}]: ${11}"
-  echo "============================================"
+	echo "CLIENT_NAME[{9}]: ${9}"
+	echo "NODE_SERVICE_HOST_PATTERN[{10}]: ${10}"
+	echo "============================================"
 	echo
 	exit 1
 fi
 # -----------------------------------------------------------------------------------
-ApplicationName="$(echo "$AGENT_NAME" | tr '[:upper:]' '[:lower:]')-agent"
-ServiceDescription="Exposes and load balances the pods for the ${AGENT_NAME} agent."
+ApplicationName="$(echo "$CLIENT_NAME" | tr '[:upper:]' '[:lower:]')-client"
+ServiceDescription="Exposes and load balances the pods for the ${CLIENT_NAME} client."
 ApplicationHostName=""
 ImageNamespace=""
 DeploymentConfig="${ApplicationName}${DEPLOYMENT_CONFIG_POST_FIX}"
 # ===================================================================================
 
-echo "Generating deployment configuration file for the ${AGENT_NAME} agent..."
+echo "Generating deployment configuration file for the ${CLIENT_NAME} client..."
 
 if [ ! -z "$DEBUG_MESSAGES" ]; then
 	echo
 	echo "------------------------------------------------------------------------"
-	echo "Parameters for call to 'oc process' for the ${AGENT_NAME} agent..."
+	echo "Parameters for call to 'oc process' for the ${CLIENT_NAME} client..."
 	echo "------------------------------------------------------------------------"
 	echo "Template=${DEPLOYMENT_CONFIG_TEMPLATE}"
 	echo "APPLICATION_NAME=${ApplicationName}"
@@ -119,9 +112,7 @@ if [ ! -z "$DEBUG_MESSAGES" ]; then
 	echo "NODE_IP_LIST=${NODE_IP_LIST}"
 	echo "NODE_COUNT=${NODE_COUNT}"
 	echo "CLIENT_COUNT=${CLIENT_COUNT}"
-	echo "HOME_DIR=${HOME_DIRECTORY}"	
-	echo "AGENT_NAME=${AGENT_NAME}"
-	echo "AGENT_PORT=${AGENT_PORT}"
+	echo "HOME_DIR=${HOME_DIRECTORY}"
   echo "NODE_SERVICE_HOST_PATTERN=${NODE_SERVICE_HOST_PATTERN}"
 	echo "Output File=${DeploymentConfig}"
 	echo "------------------------------------------------------------------------"
@@ -140,8 +131,6 @@ oc process \
 -p NODE_COUNT=${NODE_COUNT} \
 -p CLIENT_COUNT=${CLIENT_COUNT} \
 -p HOME_DIR=${HOME_DIRECTORY} \
--p AGENT_NAME=${AGENT_NAME} \
--p AGENT_PORT=${AGENT_PORT} \
 -p NODE_SERVICE_HOST_PATTERN=${NODE_SERVICE_HOST_PATTERN} \
 > ${DeploymentConfig}
 echo "Generated ${DeploymentConfig} ..."
