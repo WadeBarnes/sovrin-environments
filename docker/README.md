@@ -22,19 +22,25 @@ Defaults:
 * IP address is the next in sequence of IP addresses read from pool data (e.g. 10.0.0.6)
 * Number of clients is 10
 
-Container is removed automatically after sovrin shell is closed.
+Container is retained after sovrin shell is closed. Executing ```client_stop.sh``` removes the container.
 
 # Start agents (optional)
 
-If you are planning to run the Sovrin Tutorial (about Emily, her transcripts, job and bank), start the organization Sovrin Agents using the instructions in [StartSovrinAgents.md](StartSovrinAgents.md) in this folder.
+If you are planning to run the Sovrin Tutorial (about Alice, her transcripts, job, and bank), start the organization Sovrin Agents using the instructions in [StartSovrinAgents.md](StartSovrinAgents.md) in this folder.
 
 # Stop pool
 ```
-./pool_stop.sh [file with pool data] [pool newtwork name]
+./pool_stop.sh [file with pool data] [pool network name]
 ```
 Defaults:
 * File is pool_data
 * Network name is pool-network
+
+# Stop client
+```
+./client_stop.sh
+```
+Stopping the sovrin client removes the client container.
 
 # Running on Windows using git bash
 

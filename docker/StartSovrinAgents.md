@@ -35,8 +35,11 @@ Create Faber College as an Identity and one that is a Trust Anchor.
 ```send NYM dest=ULtgFQJe6bjiFbs7ke3NJD role=TRUST_ANCHOR verkey=~5kh3FB4H3NKq7tUDqeqHc1```
 
 NOTE: Be sure that the CLI responds with an "ADDED" response such as
-```Adding nym ULtgFQJe6bjiFbs7ke3NJD
+```
+Adding nym ULtgFQJe6bjiFbs7ke3NJD
 Nym ULtgFQJe6bjiFbs7ke3NJD added
+```
+
 If you don't get the "ADDED" response then one of the Nodes may not have started and you likely have to restart the pool with the ./pool_start.sh command
 
 ```new key with seed Faber000000000000000000000000000```
@@ -103,6 +106,6 @@ If you want to monitor one of the logs while executing the rest of the tutorial,
 
 To stream the end of the (in the case) Faber College agent log. Ctrl-C to exit out of that.
 
-That completes the process for starting the Agents. Leave this command line running while you complete the rest of the tutorial - the story of Emily, her transcripts, job and banking - in the terminal window in which you ran the script to start the Sovrin Client. You should be at a "sovrin" prompt.
+That completes the process for starting the Agents. Leave this command line running while you complete the rest of the tutorial - the story of Alice, her transcripts, job, and banking - in the terminal window in which you ran the script to start the Sovrin Client. You should be at a "sovrin" prompt.
 
 Note that when the sovrinclient container stops, the agents will stop automatically. That will happen when you "exit" from the sovrin command line in the other terminal window.
