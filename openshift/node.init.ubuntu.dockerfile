@@ -22,7 +22,7 @@ ENV HOLD_EXT="sovrin "
 
 EXPOSE $nport $cport
 
-COPY ./scripts/common/initialize.sh /home/sovrin/
+COPY ./scripts/common/*.sh /home/sovrin/
 COPY ./scripts/node/start.sh /home/sovrin/
 
 RUN chown -R sovrin:root /home/sovrin && \

@@ -11,7 +11,7 @@ ENV HOME=/home/sovrin
 
 EXPOSE 5000-9799
 
-COPY ./scripts/common/initialize.sh /home/sovrin/
+COPY ./scripts/common/*.sh /home/sovrin/
 COPY ./scripts/client/start.sh /home/sovrin/
 
 RUN chown -R sovrin:root /home/sovrin && \
