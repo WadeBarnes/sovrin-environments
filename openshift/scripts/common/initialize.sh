@@ -29,9 +29,9 @@ if [ ! -z "${NODE_SERVICE_HOST_PATTERN}" ]; then
     echo -e "\tNODE_IP_LIST: ${NODE_IP_LIST}"
     echo -------------------------------------------------------------------------------
     echo "Changing;"
-    echo -e "\NODE_COUNT: ${NODE_COUNT}"
+    echo -e "\tNODE_COUNT: ${NODE_COUNT}"
     export NODE_COUNT=${NEW_NODE_COUNT}
-    echo -e "\NODE_COUNT: ${NODE_COUNT}"
+    echo -e "\tNODE_COUNT: ${NODE_COUNT}"
     echo ===============================================================================
     echo
   fi
