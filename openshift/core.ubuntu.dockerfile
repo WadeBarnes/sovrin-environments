@@ -1,5 +1,6 @@
 FROM sovrinbase
 
+ARG sovrinVersion=1.1.26
 ARG uid=1000
 ARG gid=0
 
@@ -25,4 +26,4 @@ RUN echo "deb https://repo.evernym.com/deb xenial master" >> /etc/apt/sources.li
 RUN echo "deb https://repo.sovrin.org/deb xenial master" >> /etc/apt/sources.list
 
 RUN useradd -ms /bin/bash -l -u $uid -G $gid sovrin
-RUN apt-get update -y && apt-get install -y sovrin
+RUN apt-get update -y && apt-get install -y sovrin=$sovrinVersion
